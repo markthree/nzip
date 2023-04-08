@@ -24,6 +24,12 @@ deno install --allow-read --allow-write --allow-run -rfn nzip https://deno.land/
 nzip # in your porject
 ```
 
+### tar
+
+```shell
+nzip -t tar # in your porject
+```
+
 <br />
 
 ## License

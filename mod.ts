@@ -13,7 +13,7 @@ const types = new EnumType(["tar", "zip"]);
 
 const args = await new Command()
   .name("nzip")
-  .version("0.0.2")
+  .version("0.1.0")
   .type("type", types)
   .option("-t, --type <type:type>", "Set type.", {
     default: "zip" as const,
