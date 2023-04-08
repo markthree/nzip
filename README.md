@@ -15,7 +15,7 @@ Intelligent fast compression | 智能化快速压缩
 ### install
 
 ```shell
-deno install --allow-read --allow-write -rfn nzip https://deno.land/x/nzip/mod.ts
+deno install --allow-read --allow-write --allow-run -rfn nzip https://deno.land/x/nzip/mod.ts
 ```
 
 ### zip 
