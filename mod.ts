@@ -63,8 +63,9 @@ async function walkFiles(dir: string) {
   const files: string[] = [];
   for await (
     const entry of walk(dir, {
-      skip: [/node_modules|temp|cache|dist|\.(nuxt|output)/],
       includeDirs: false,
+      followSymlinks: true,
+      skip: [/node_modules|temp|cache|dist|\.(nuxt|output)/],
     })
   ) {
     files.push(relative(cwd, entry.path));
