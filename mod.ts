@@ -9,44 +9,48 @@ import {
   EnumType,
 } from "https://deno.land/x/cliffy@v0.25.7/command/mod.ts";
 
-const types = new EnumType(["tar", "zip"]);
+export * from "./src/compress.ts"
 
-const args = await new Command()
-  .name("nzip")
-  .version("0.1.0")
-  .type("type", types)
-  .option("-t, --type <type:type>", "Set type.", {
-    default: "zip" as const,
-  })
-  .description("Intelligent fast compression | 智能化快速压缩")
-  .parse(Deno.args);
+if (import.meta.main) {
+  const types = new EnumType(["tar", "zip"]);
 
-// constant
-const { type } = args.options;
-const suffix = type;
-const cwd = Deno.cwd();
-const base = basename(cwd) ?? "default";
-const output = `${base}.${suffix}`;
+  const args = await new Command()
+    .name("nzip")
+    .version("0.2.1")
+    .type("type", types)
+    .option("-t, --type <type:type>", "Set type.", {
+      default: "zip" as const,
+    })
+    .description("Intelligent fast compression | 智能化快速压缩")
+    .parse(Deno.args);
 
-await mayBeExists(output);
+  // constant
+  const { type } = args.options;
+  const suffix = type;
+  const cwd = Deno.cwd();
+  const base = basename(cwd) ?? "default";
+  const output = `${base}.${suffix}`;
 
-const files = await walkFiles(cwd);
+  await mayBeExists(output);
 
-if (type === "zip") {
-  await zip(files, output);
-} else {
-  await tar(files, output);
-}
+  const files = await walkFiles(cwd);
 
-const { size: outoutSize } = await Deno.lstat(output);
+  if (type === "zip") {
+    await zip(files, output);
+  } else {
+    await tar(files, output);
+  }
 
-console.log(`
+  const { size: outoutSize } = await Deno.lstat(output);
+
+  console.log(`
 type - ${green(type)}
 size - ${green(prettyBytes(outoutSize))}
 output - ${green(join(cwd, output))}
 `);
+}
 
-async function mayBeExists(output: string) {
+export async function mayBeExists(output: string) {
   if (await exists(output)) {
     const foreceUpdate = confirm(
       "😬 The file already exists. Do you want to force an update ?",
@@ -59,7 +63,7 @@ async function mayBeExists(output: string) {
   }
 }
 
-async function walkFiles(dir: string) {
+export async function walkFiles(dir: string) {
   const files: string[] = [];
   for await (
     const entry of walk(dir, {
@@ -68,7 +72,7 @@ async function walkFiles(dir: string) {
       skip: [/node_modules|temp|cache|dist|\.(nuxt|output)/],
     })
   ) {
-    files.push(relative(cwd, entry.path));
+    files.push(relative(dir, entry.path));
   }
   return files;
 }

@@ -18,16 +18,26 @@ Intelligent fast compression | 智能化快速压缩
 deno install --allow-read --allow-write --allow-run -rfn nzip https://deno.land/x/nzip/mod.ts
 ```
 
-### zip 
+### cli 
+
+#### zip
 
 ```shell
 nzip # in your porject
 ```
-
-### tar
+#### tar
 
 ```shell
 nzip -t tar # in your porject
+```
+
+### program
+
+```ts
+import { tar, zip } from "https://deno.land/x/nzip/mod.ts"
+
+await tar(['/path/file1', '/path/file2'], 'output.tar')
+await zip(['/path/file1', '/path/file2'], 'output.zip')
 ```
 
 <br />
