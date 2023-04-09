@@ -16,7 +16,7 @@ if (import.meta.main) {
 
   const args = await new Command()
     .name("nzip")
-    .version("0.2.1")
+    .version("0.1.1")
     .type("type", types)
     .option("-t, --type <type:type>", "Set type.", {
       default: "zip" as const,
