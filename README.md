@@ -6,7 +6,14 @@ Intelligent fast compression | 智能化快速压缩
 
 ## Support
 
-- nodejs Ignore node_modules and any cache | 忽略 node_modules 和常见缓存
+### cli
+
+- nodejs Ignore node_modules and any cache | 忽略 nodejs 的 node_modules 和常见缓存
+
+### program
+
+- Streaming zip | 流式 zip
+- Multi-file synthesis | 多文件合成
 
 <br />
 
