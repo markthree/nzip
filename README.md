@@ -49,6 +49,13 @@ await zip(['/path/file1', '/path/file2'], 'output.zip')
 
 <br />
 
+## TODO
+
+- Back pressure treatment
+
+
+<br />
+
 ## License
 
 Made with [markthree](https://github.com/markthree)

@@ -38,27 +38,15 @@ export function zip(files: string[], output: string) {
 }
 
 export function createZipDeflate(path: string) {
-  const chunks: Uint8Array[] = []
   const srcStream = createReadStream(path)
   const zipDeflate = new fflate.ZipDeflate(path)
 
   srcStream.on("data", (chunk: Uint8Array) => {
-    chunks.push(chunk)
+    zipDeflate.push(chunk, true)
   })
 
   srcStream.on("end", () => {
-    // empty file
-    if (chunks.length === 0) {
-      zipDeflate.push(new Uint8Array(), true)
-    }
-    const lastIndex = chunks.length - 1
-    chunks.forEach((chunk, index) => {
-      if (lastIndex !== index) {
-        zipDeflate.push(chunk)
-        return
-      }
-      zipDeflate.push(chunk, true)
-    })
+    zipDeflate.push(new Uint8Array(0), true)
   })
 
   return zipDeflate
