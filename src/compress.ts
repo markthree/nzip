@@ -42,7 +42,7 @@ export function createZipDeflate(path: string) {
   const zipDeflate = new fflate.ZipDeflate(path)
 
   srcStream.on("data", (chunk: Uint8Array) => {
-    zipDeflate.push(chunk, true)
+    zipDeflate.push(chunk)
   })
 
   srcStream.on("end", () => {
