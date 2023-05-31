@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run -A mod.ts"
+    "dev": "deno run -A mod.ts",
+    "install": "deno install --allow-read --allow-write --allow-run -rfn nzip mod.ts"
   },
   "fmt": {
     "options": {
