@@ -12,13 +12,14 @@ import {
   relative,
   walk,
 } from "./src/deps.ts"
+import { version } from "./src/version.ts"
 
 if (import.meta.main) {
   const types = new EnumType(["tar", "zip"])
 
   const args = await new Command()
     .name("nzip")
-    .version("0.2.3")
+    .version(version)
     .type("type", types)
     .option("-t, --type <type:type>", "Set type.", {
       default: "zip" as const,
