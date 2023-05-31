@@ -11,7 +11,7 @@ export {
   basename,
   join,
   relative,
-} from "https://deno.land/std@0.182.0/path/mod.ts"
+} from "https://deno.land/std@0.189.0/path/mod.ts"
 export {
   Command,
   EnumType,
