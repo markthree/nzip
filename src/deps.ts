@@ -1,6 +1,5 @@
 export { pipeline, Readable } from "node:stream"
-// @deno-types="https://cdn.skypack.dev/fflate/lib/index.d.ts"
-export * as fflate from "https://cdn.skypack.dev/fflate?min"
+export * as fflate from "https://cdn.skypack.dev/fflate@0.8.0?min&dts"
 export { createReadStream, createWriteStream } from "node:fs"
 export { Tar } from "https://deno.land/std@0.190.0/archive/tar.ts"
 export { copy } from "https://deno.land/std@0.190.0/streams/copy.ts"
