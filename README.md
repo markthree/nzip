@@ -29,7 +29,7 @@ deno install --allow-read --allow-write --allow-run -rfn nzip https://deno.land/
 Of course, if you don't have Deno installed | 当然如果你没装过 deno 👇
 
 ```shell
-npx deno-npx install --allow-read --allow-env --allow-run --allow-write --unstable -rfn n https://deno.land/x/ndeno/mod.ts
+npx deno-npx install --allow-read --allow-write --allow-run -rfn nzip https://deno.land/x/nzip/mod.ts
 ```
 
 ### cli
