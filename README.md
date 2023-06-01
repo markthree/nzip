@@ -8,7 +8,8 @@ Intelligent fast compression | 智能化快速压缩
 
 ### cli
 
-- nodejs Ignore node_modules and any cache | 忽略 nodejs 的 node_modules 和常见缓存
+- nodejs Ignore node_modules and any cache | 忽略 nodejs 的 node_modules
+  和常见缓存
 
 ### program
 
@@ -25,13 +26,20 @@ Intelligent fast compression | 智能化快速压缩
 deno install --allow-read --allow-write --allow-run -rfn nzip https://deno.land/x/nzip/mod.ts
 ```
 
-### cli 
+Of course, if you don't have Deno installed | 当然如果你没装过 deno 👇
+
+```shell
+npx deno-npx install --allow-read --allow-env --allow-run --allow-write --unstable -rfn n https://deno.land/x/ndeno/mod.ts
+```
+
+### cli
 
 #### zip
 
 ```shell
 nzip # in your porject
 ```
+
 #### tar
 
 ```shell
@@ -43,8 +51,8 @@ nzip -t tar # in your porject
 ```ts
 import { tar, zip } from "https://deno.land/x/nzip/mod.ts"
 
-await tar(['/path/file1', '/path/file2'], 'output.tar')
-await zip(['/path/file1', '/path/file2'], 'output.zip')
+await tar(["/path/file1", "/path/file2"], "output.tar")
+await zip(["/path/file1", "/path/file2"], "output.zip")
 ```
 
 <br />
@@ -52,7 +60,6 @@ await zip(['/path/file1', '/path/file2'], 'output.zip')
 ## TODO
 
 - Back pressure treatment
-
 
 <br />
 
