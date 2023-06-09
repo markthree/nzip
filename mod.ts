@@ -1,5 +1,6 @@
 export * from "./src/deps.ts"
 export * from "./src/compress.ts"
+export * from "./src/decompress.ts"
 import { tar, zip } from "./src/compress.ts"
 import {
   basename,
