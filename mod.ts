@@ -73,7 +73,9 @@ export async function walkFiles(dir: string) {
     const entry of walk(dir, {
       includeDirs: false,
       followSymlinks: true,
-      skip: [/node_modules|temp|cache|dist|\.(nuxt|output)/],
+      skip: [
+        /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|output))(?=[\\\/])/,
+      ],
     })
   ) {
     files.push(relative(dir, entry.path))
