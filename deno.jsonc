@@ -9,9 +9,6 @@
       "semiColons": false
     }
   },
-  "compilerOptions": {
-    "types": ["npm:@types/node"]
-  },
   "lint": {
     "rules": {
       "exclude": ["no-explicit-any"]
