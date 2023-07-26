@@ -56,8 +56,8 @@ await tar(["/path/file1", "/path/file2"], "output.tar")
 await zip(["/path/file1", "/path/file2"], "output.zip")
 
 // decompress 解压
-await untar('output.tar', '/path2/')
-await unzip('output.tar', '/path2/')
+await untar("output.tar", "/path2/")
+await unzip("output.tar", "/path2/")
 ```
 
 <br />

@@ -21,7 +21,7 @@ export {
   EnumType,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.2/command/mod.ts"
 
-export { default as AdmZip } from "npm:adm-zip-iconv@0.4.9";
+export { default as AdmZip } from "npm:adm-zip-iconv@0.4.9"
 
 export function noop() {
 }
