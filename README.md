@@ -49,15 +49,15 @@ nzip -t tar # in your porject
 ### program
 
 ```ts
-import { tar, untar, unzip, zip } from "https://deno.land/x/nzip/mod.ts"
+import { tar, untar, unzip, zip } from "https://deno.land/x/nzip/mod.ts";
 
 // compress 压缩
-await tar(["/path/file1", "/path/file2"], "output.tar")
-await zip(["/path/file1", "/path/file2"], "output.zip")
+await tar(["/path/file1", "/path/file2"], "output.tar");
+await zip(["/path/file1", "/path/file2"], "output.zip");
 
 // decompress 解压
-await untar("output.tar", "/path2/")
-await unzip("output.tar", "/path2/")
+await untar("output.tar", "/path2/");
+await unzip("output.tar", "/path2/");
 ```
 
 <br />
