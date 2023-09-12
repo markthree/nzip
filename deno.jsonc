@@ -3,12 +3,5 @@
     "dev": "deno run -A mod.ts",
     "release": "deno run --allow-read --allow-write --allow-env --allow-run https://deno.land/x/easy_std@v0.4.3/scripts/release.ts",
     "install": "deno install --allow-read --allow-write --allow-run -rfn nzip mod.ts"
-  },
-  "lint": {
-    "rules": {
-      "exclude": [
-        "no-explicit-any"
-      ]
-    }
   }
 }

@@ -27,11 +27,11 @@ export function zip(files: string[], output: string) {
   const outStream = createWriteStream(output);
   const zipStream = createZipReadStream(files);
   return new Promise((resolve, reject) => {
-    pipeline(zipStream, outStream, (err: any) => {
+    pipeline(zipStream, outStream, (err) => {
       if (err) {
         reject(err);
       } else {
-        resolve(undefined);
+        resolve(null);
       }
     });
   });
