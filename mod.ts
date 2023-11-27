@@ -5,8 +5,11 @@ import { tar, zip } from "./src/compress.ts";
 import {
   basename,
   Command,
+  emptyDir,
+  ensureDir,
   EnumType,
   exists,
+  extname,
   green,
   join,
   prettyBytes,
@@ -14,11 +17,12 @@ import {
   walk,
 } from "./src/deps.ts";
 import { version } from "./src/version.ts";
+import { untar, unzip } from "./src/decompress.ts";
 
 if (import.meta.main) {
   const types = new EnumType(["tar", "zip"]);
 
-  const args = await new Command()
+  const nzip = new Command()
     .name("nzip")
     .version(version)
     .type("type", types)
@@ -29,32 +33,72 @@ if (import.meta.main) {
       default: true,
     })
     .description("Intelligent fast compression | 智能化快速压缩")
-    .parse(Deno.args);
+    .action(async ({ type, withConfig }) => {
+      const suffix = type;
+      const cwd = Deno.cwd();
+      const base = basename(cwd) ?? "default";
+      const output = `${base}.${suffix}`;
 
-  // constant
-  const { type, withConfig } = args.options;
-  const suffix = type;
-  const cwd = Deno.cwd();
-  const base = basename(cwd) ?? "default";
-  const output = `${base}.${suffix}`;
+      await mayBeExists(output);
 
-  await mayBeExists(output);
+      const files = await walkFiles(cwd, withConfig);
 
-  const files = await walkFiles(cwd, withConfig);
+      if (type === "zip") {
+        await zip(files, output);
+      } else {
+        await tar(files, output);
+      }
 
-  if (type === "zip") {
-    await zip(files, output);
-  } else {
-    await tar(files, output);
-  }
+      const { size: outoutSize } = await Deno.lstat(output);
 
-  const { size: outoutSize } = await Deno.lstat(output);
-
-  console.log(`
+      console.log(`
 type - ${green(type)}
 size - ${green(prettyBytes(outoutSize))}
 output - ${green(join(cwd, output))}
 `);
+    });
+
+  const decompress = new Command().description("decompress file to output")
+    .alias("de")
+    .command(
+      "decompress <file:string> <output:string>",
+      "decompress file to output",
+    )
+    .action(async (_, file: string, output: string) => {
+      if (!await exists(file, { isFile: true })) {
+        throw new Deno.errors.NotFound("file does not exist");
+      }
+
+      if (await exists(output, { isDirectory: true })) {
+        const clean = confirm(
+          "😬 The output already exists. Do you want to force an update ?",
+        );
+
+        if (!clean) {
+          Deno.exit(0);
+        }
+        await emptyDir(output);
+      }
+      await ensureDir(output);
+      const ext = extname(file);
+      if (ext === ".zip") {
+        await unzip(file, output);
+        return;
+      }
+
+      if (ext === ".rar") {
+        await untar(file, output);
+        return;
+      }
+
+      throw new Deno.errors.NotSupported(
+        "nzip decompression only supports. zip and. rar files",
+      );
+    });
+
+  nzip.command("decompress", decompress);
+
+  nzip.parse(Deno.args);
 }
 
 export async function mayBeExists(output: string) {

@@ -5,6 +5,7 @@ export { Tar, Untar } from "https://deno.land/std@0.208.0/archive/mod.ts";
 export { copy } from "https://deno.land/std@0.208.0/streams/copy.ts";
 export { green } from "https://deno.land/std@0.208.0/fmt/colors.ts";
 export {
+  emptyDir,
   ensureDir,
   ensureFile,
   exists,
@@ -13,6 +14,7 @@ export {
 export { format as prettyBytes } from "https://deno.land/std@0.208.0/fmt/bytes.ts";
 export {
   basename,
+  extname,
   join,
   relative,
 } from "https://deno.land/std@0.208.0/path/mod.ts";
