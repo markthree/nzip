@@ -9,6 +9,7 @@ import {
   exists,
   green,
   join,
+  loadConfig,
   prettyBytes,
   relative,
   walk,
@@ -69,13 +70,23 @@ export async function mayBeExists(output: string) {
 
 export async function walkFiles(dir: string) {
   const files: string[] = [];
+  const skip = [
+    /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|nitro|output))(?=[\\\/])/,
+  ];
+
+  const { config } = await loadConfig<{ skip: Array<RegExp | string> }>({
+    name: "nzip",
+    packageJson: true,
+  });
+  config?.skip.forEach((s) => {
+    skip.push(typeof s === "string" ? new RegExp(s) : s);
+  });
+
   for await (
     const entry of walk(dir, {
+      skip,
       includeDirs: false,
       includeFiles: true,
-      skip: [
-        /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|nitro|output))(?=[\\\/])/,
-      ],
     })
   ) {
     files.push(relative(dir, entry.path));
