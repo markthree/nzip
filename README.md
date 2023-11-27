@@ -80,7 +80,7 @@ nzip # Automatically merge configurations
 #### decompress
 
 ```shell
-nzip de your.zip outputDir
+nzip de <your.zip|your.rar> <output>
 ```
 
 <br />
