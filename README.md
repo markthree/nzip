@@ -77,6 +77,12 @@ export default {
 nzip # Automatically merge configurations
 ```
 
+#### decompress
+
+```shell
+nzip de your.zip outputDir
+```
+
 <br />
 
 ## TODO
