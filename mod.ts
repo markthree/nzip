@@ -60,6 +60,7 @@ output - ${green(join(cwd, output))}
 
   const decompress = new Command().description("decompress file to output")
     .alias("de")
+    .alias("un")
     .command(
       "decompress <file:string> <output:string>",
       "decompress file to output",
