@@ -23,7 +23,5 @@ export {
 
 export { default as AdmZip } from "npm:adm-zip-iconv@0.4.9";
 
-export { loadConfig } from "npm:c12@1.5.1";
-
 export function noop() {
 }

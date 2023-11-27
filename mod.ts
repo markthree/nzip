@@ -9,7 +9,6 @@ import {
   exists,
   green,
   join,
-  loadConfig,
   prettyBytes,
   relative,
   walk,
@@ -26,11 +25,14 @@ if (import.meta.main) {
     .option("-t, --type <type:type>", "Set type.", {
       default: "zip" as const,
     })
+    .option("-w, --withConfig <withConfig:boolean>", "With c12 config", {
+      default: true,
+    })
     .description("Intelligent fast compression | 智能化快速压缩")
     .parse(Deno.args);
 
   // constant
-  const { type } = args.options;
+  const { type, withConfig } = args.options;
   const suffix = type;
   const cwd = Deno.cwd();
   const base = basename(cwd) ?? "default";
@@ -38,7 +40,7 @@ if (import.meta.main) {
 
   await mayBeExists(output);
 
-  const files = await walkFiles(cwd);
+  const files = await walkFiles(cwd, withConfig);
 
   if (type === "zip") {
     await zip(files, output);
@@ -68,19 +70,18 @@ export async function mayBeExists(output: string) {
   }
 }
 
-export async function walkFiles(dir: string) {
+export async function walkFiles(dir: string, withConfig = true) {
   const files: string[] = [];
   const skip = [
     /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|nitro|output))(?=[\\\/])/,
   ];
 
-  const { config } = await loadConfig<{ skip: Array<RegExp | string> }>({
-    name: "nzip",
-    packageJson: true,
-  });
-  config?.skip.forEach((s) => {
-    skip.push(typeof s === "string" ? new RegExp(s) : s);
-  });
+  if (withConfig) {
+    const config = await loadConfig();
+    config?.skip?.forEach((s) => {
+      skip.push(typeof s === "string" ? new RegExp(s) : s);
+    });
+  }
 
   for await (
     const entry of walk(dir, {
@@ -92,4 +93,13 @@ export async function walkFiles(dir: string) {
     files.push(relative(dir, entry.path));
   }
   return files;
+}
+
+export async function loadConfig() {
+  const { loadConfig: _loadConfig } = await import("npm:c12@1.5.1");
+  const { config } = await _loadConfig<{ skip: Array<RegExp | string> }>({
+    name: "nzip",
+    packageJson: true,
+  });
+  return config;
 }
