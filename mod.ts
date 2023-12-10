@@ -3,7 +3,6 @@ export * from "./src/compress.ts";
 export * from "./src/decompress.ts";
 import { tar, zip } from "./src/compress.ts";
 import {
-  basename,
   Command,
   emptyDir,
   ensureDir,
@@ -18,6 +17,7 @@ import {
 } from "./src/deps.ts";
 import { version } from "./src/version.ts";
 import { untar, unzip } from "./src/decompress.ts";
+type ExternalSkip = Array<string | RegExp>;
 
 if (import.meta.main) {
   const types = new EnumType(["tar", "zip"]);
@@ -33,15 +33,11 @@ if (import.meta.main) {
       default: true,
     })
     .description("Intelligent fast compression | 智能化快速压缩")
-    .action(async ({ type, withConfig }) => {
-      const suffix = type;
-      const cwd = Deno.cwd();
-      const base = basename(cwd) ?? "default";
-      const output = `${base}.${suffix}`;
+    .action(async (options) => {
+      const { cwd, output, externalSkip, type } = await loadOptions(options);
 
       await mayBeExists(output);
-
-      const files = await walkFiles(cwd, withConfig);
+      const files = await walkFiles(cwd, externalSkip);
 
       if (type === "zip") {
         await zip(files, output);
@@ -115,18 +111,18 @@ export async function mayBeExists(output: string) {
   }
 }
 
-export async function walkFiles(dir: string, withConfig = true) {
+export async function walkFiles(
+  dir: string,
+  externalskip: ExternalSkip = [],
+) {
   const files: string[] = [];
   const skip = [
     /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|nitro|output))(?=[\\\/])/,
   ];
 
-  if (withConfig) {
-    const config = await loadConfig();
-    config?.skip?.forEach((s) => {
-      skip.push(typeof s === "string" ? new RegExp(s) : s);
-    });
-  }
+  externalskip?.forEach((s) => {
+    skip.push(typeof s === "string" ? new RegExp(s) : s);
+  });
 
   for await (
     const entry of walk(dir, {
@@ -142,9 +138,38 @@ export async function walkFiles(dir: string, withConfig = true) {
 
 export async function loadConfig() {
   const { loadConfig: _loadConfig } = await import("npm:c12@1.5.1");
-  const { config } = await _loadConfig<{ skip: Array<RegExp | string> }>({
+  const { config } = await _loadConfig<
+    { skip?: ExternalSkip; name?: string }
+  >({
     name: "nzip",
     packageJson: true,
   });
   return config;
+}
+
+interface Options {
+  withConfig: boolean;
+  type: "zip" | "tar";
+}
+
+export async function loadOptions(options: Options) {
+  const cwd = Deno.cwd();
+
+  if (options.withConfig) {
+    const config = await loadConfig();
+    const name = config?.name ?? "default";
+    const output = `${name}.${options.type}`;
+    const externalSkip = config?.skip ?? [];
+    return {
+      cwd,
+      output,
+      externalSkip,
+      type: options.type,
+    };
+  }
+  return {
+    cwd,
+    type: options.type,
+    output: `default.${options.type}`,
+  };
 }
