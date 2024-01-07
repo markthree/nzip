@@ -57,10 +57,7 @@ output - ${green(join(cwd, output))}
   const decompress = new Command().description("decompress file to output")
     .alias("de")
     .alias("un")
-    .command(
-      "decompress <file:string> <output:string>",
-      "decompress file to output",
-    )
+    .arguments("<file:string> <output:string>")
     .action(async (_, file: string, output: string) => {
       if (!await exists(file, { isFile: true })) {
         throw new Deno.errors.NotFound("file does not exist");
