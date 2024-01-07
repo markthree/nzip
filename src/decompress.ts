@@ -1,4 +1,14 @@
-import { AdmZip, copy, ensureDir, ensureFile, join, Untar } from "./deps.ts";
+import {
+  AdmZip,
+  Buffer,
+  copy,
+  ensureDir,
+  ensureFile,
+  iconv,
+  join,
+  jschardet,
+  Untar,
+} from "./deps.ts";
 
 export async function untar(file: string, output: string) {
   const reader = await Deno.open(file, { read: true });
@@ -19,7 +29,24 @@ export async function untar(file: string, output: string) {
   reader.close();
 }
 
-export function unzip(file: string, output: string, nameEncoding = "GBK") {
-  const zip = new AdmZip(file, nameEncoding);
+export function unzip(file: string, output: string, nameEncoding?: string) {
+  const zip = new AdmZip(file);
+  const zipEntries = zip.getEntries();
+  for (let i = 0; i < zipEntries.length; i++) {
+    const entry = zipEntries[i];
+    if (nameEncoding) {
+      entry.entryName = iconv.encode(entry.entryName, nameEncoding);
+      continue;
+    }
+    const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
+    if (confidence > 0.9 && Buffer.isEncoding(encoding)) {
+      entry.entryName = entry.rawEntryName.toString(encoding);
+      continue;
+    }
+    entry.entryName = iconv.decode(
+      entry.rawEntryName,
+      "gbk",
+    );
+  }
   return zip.extractAllTo(output, true);
 }

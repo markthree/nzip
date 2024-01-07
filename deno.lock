@@ -3,9 +3,15 @@
   "packages": {
     "specifiers": {
       "npm:@types/node": "npm:@types/node@18.16.19",
+      "npm:adm-zip": "npm:adm-zip@0.5.10",
       "npm:adm-zip-iconv@0.4.9": "npm:adm-zip-iconv@0.4.9",
+      "npm:adm-zip@0.5.10": "npm:adm-zip@0.5.10",
       "npm:c12": "npm:c12@1.4.2",
-      "npm:c12@1.5.1": "npm:c12@1.5.1"
+      "npm:c12@1.5.1": "npm:c12@1.5.1",
+      "npm:iconv-lite": "npm:iconv-lite@0.4.24",
+      "npm:iconv-lite@0.6.3": "npm:iconv-lite@0.6.3",
+      "npm:jschardet": "npm:jschardet@3.0.0",
+      "npm:jschardet@3.0.0": "npm:jschardet@3.0.0"
     },
     "npm": {
       "@types/node@18.16.19": {
@@ -21,6 +27,10 @@
         "dependencies": {
           "iconv-lite": "iconv-lite@0.4.24"
         }
+      },
+      "adm-zip@0.5.10": {
+        "integrity": "sha512-x0HvcHqVJNTPk/Bw8JbLWlWoo6Wwnsug0fnYYro1HBrjxZ3G7/AZk7Ahv8JwDe1uIcz8eBqvu86FuF1POiG7vQ==",
+        "dependencies": {}
       },
       "agent-base@6.0.2": {
         "integrity": "sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==",
@@ -192,6 +202,12 @@
           "safer-buffer": "safer-buffer@2.1.2"
         }
       },
+      "iconv-lite@0.6.3": {
+        "integrity": "sha512-4fCk79wshMdzMp2rH06qWrJE4iolqLhCUH+OiuIgU++RB0+94NlDL81atO7GX55uUKueo0txHNtvEyI6D7WdMw==",
+        "dependencies": {
+          "safer-buffer": "safer-buffer@2.1.2"
+        }
+      },
       "is-binary-path@2.1.0": {
         "integrity": "sha512-ZMERYes6pDydyuGidse7OsHxtbI7WVeUEozgR/g7rd0xUimYNlvZRE/K2MgZTjWy725IfelLeVcEM97mmtRGXw==",
         "dependencies": {
@@ -218,6 +234,10 @@
       },
       "jiti@1.21.0": {
         "integrity": "sha512-gFqAIbuKyyso/3G2qhiO2OM6shY6EPP/R0+mkDbyspxKazh8BXDC5FiFsUjlczgdNz/vfra0da2y+aHrusLG/Q==",
+        "dependencies": {}
+      },
+      "jschardet@3.0.0": {
+        "integrity": "sha512-lJH6tJ77V8Nzd5QWRkFYCLc13a3vADkh3r/Fi8HupZGWk2OVVDfnZP8V/VgQgZ+lzW0kG2UGb5hFgt3V3ndotQ==",
         "dependencies": {}
       },
       "jsonc-parser@3.2.0": {
