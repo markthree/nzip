@@ -126,6 +126,8 @@ export async function walkFiles(
       skip,
       includeDirs: false,
       includeFiles: true,
+      followSymlinks: true,
+      includeSymlinks: true,
     })
   ) {
     files.push(relative(dir, entry.path));
