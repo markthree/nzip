@@ -10,12 +10,19 @@ import {
   Untar,
 } from "./deps.ts";
 
-export async function untar(file: string, output: string) {
+interface UntarOptions {
+  ignore?: (entryName: string) => boolean;
+}
+
+export async function untar(file: string, output: string, options?: UntarOptions) {
   const reader = await Deno.open(file, { read: true });
   const untar = new Untar(reader);
 
   for await (const entry of untar) {
     const { fileName, type } = entry;
+    if (options?.ignore && options.ignore(fileName)) {
+      continue;
+    }
     const path = join(output, fileName);
     if (type === "directory") {
       await ensureDir(path);
@@ -31,7 +38,7 @@ export async function untar(file: string, output: string) {
 
 interface UnzipOptions {
   nameEncoding?: string;
-  ignore: (entry: string) => boolean;
+  ignore: (entryName: string) => boolean;
 }
 
 export function unzip(
