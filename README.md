@@ -8,7 +8,8 @@ Intelligent fast compression | 智能化快速压缩
 
 ### cli
 
-- Supports [c12](https://github.com/unjs/c12) configuration | 支持 [c12](https://github.com/unjs/c12) 配置 (name: nzip)
+- Supports [c12](https://github.com/unjs/c12) configuration | 支持
+  [c12](https://github.com/unjs/c12) 配置 (name: nzip)
 - nodejs Ignore node_modules and any cache | 忽略 nodejs 的 node_modules
   和常见缓存
 
@@ -24,15 +25,15 @@ Intelligent fast compression | 智能化快速压缩
 ### program
 
 ```ts
-import { tar, untar, unzip, zip } from "https://deno.land/x/nzip/mod.ts"
+import { tar, untar, unzip, zip } from "https://deno.land/x/nzip/mod.ts";
 
 // compress 压缩
-await tar(["/path/file1", "/path/file2"], "output.tar")
-await zip(["/path/file1", "/path/file2"], "output.zip")
+await tar(["/path/file1", "/path/file2"], "output.tar");
+await zip(["/path/file1", "/path/file2"], "output.zip");
 
 // decompress 解压
-await untar("output.tar", "/path2/")
-await unzip("output.tar", "/path2/")
+await untar("output.tar", "/path2/");
+await unzip("output.tar", "/path2/");
 ```
 
 <br />
@@ -70,7 +71,7 @@ nzip -t tar # in your porject
 export default {
   // Your custom skip
   skip: [/script/],
-}
+};
 ```
 
 ```shell

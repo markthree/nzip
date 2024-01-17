@@ -29,13 +29,33 @@ export async function untar(file: string, output: string) {
   reader.close();
 }
 
-export function unzip(file: string, output: string, nameEncoding?: string) {
+interface UnzipOptions {
+  nameEncoding?: string;
+  ignore: (entry: string) => boolean;
+}
+
+export function unzip(
+  file: string,
+  output: string,
+  nameEncoding?: string,
+): undefined;
+export function unzip(
+  file: string,
+  output: string,
+  options?: UnzipOptions,
+): undefined;
+export function unzip(
+  file: string,
+  output: string,
+  nameEncodingOrOptions?: string | UnzipOptions,
+) {
+  const options = useOptions();
   const zip = new AdmZip(file);
   const zipEntries = zip.getEntries();
   for (let i = 0; i < zipEntries.length; i++) {
     const entry = zipEntries[i];
-    if (nameEncoding) {
-      entry.entryName = iconv.encode(entry.entryName, nameEncoding);
+    if (options?.nameEncoding) {
+      entry.entryName = iconv.encode(entry.entryName, options.nameEncoding);
       continue;
     }
     const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
@@ -48,5 +68,27 @@ export function unzip(file: string, output: string, nameEncoding?: string) {
       "gbk",
     );
   }
+
+  if (options?.ignore) {
+    // @ts-ignore
+    zipEntries.filter((entry) => options.ignore(entry.entryName)).forEach(
+      // @ts-ignore
+      (entry) => {
+        zip.deleteFile(entry.entryName);
+      },
+    );
+  }
+
   return zip.extractAllTo(output, true);
+
+  function useOptions() {
+    let nameEncoding: string | undefined;
+    if (typeof nameEncodingOrOptions === "string") {
+      nameEncoding = nameEncodingOrOptions;
+      return {
+        nameEncoding,
+      } as UnzipOptions;
+    }
+    return nameEncodingOrOptions;
+  }
 }
