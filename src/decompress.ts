@@ -14,7 +14,11 @@ interface UntarOptions {
   ignore?: (entryName: string) => boolean;
 }
 
-export async function untar(file: string, output: string, options?: UntarOptions) {
+export async function untar(
+  file: string,
+  output: string,
+  options?: UntarOptions,
+) {
   const reader = await Deno.open(file, { read: true });
   const untar = new Untar(reader);
 
@@ -41,6 +45,11 @@ interface UnzipOptions {
   ignore: (entryName: string) => boolean;
 }
 
+interface Entry {
+  entryName: string;
+  rawEntryName: Buffer;
+}
+
 export function unzip(
   file: string,
   output: string,
@@ -58,32 +67,15 @@ export function unzip(
 ) {
   const options = useOptions();
   const zip = new AdmZip(file);
-  const zipEntries = zip.getEntries();
-  for (let i = 0; i < zipEntries.length; i++) {
-    const entry = zipEntries[i];
-    if (options?.nameEncoding) {
-      entry.entryName = iconv.encode(entry.entryName, options.nameEncoding);
-      continue;
-    }
-    const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
-    if (confidence > 0.9 && Buffer.isEncoding(encoding)) {
-      entry.entryName = entry.rawEntryName.toString(encoding);
-      continue;
-    }
-    entry.entryName = iconv.decode(
-      entry.rawEntryName,
-      "gbk",
-    );
-  }
+  const zipEntries: Entry[] = zip.getEntries();
+
+  formatEntryNames();
 
   if (options?.ignore) {
-    // @ts-ignore
-    zipEntries.filter((entry) => options.ignore(entry.entryName)).forEach(
-      // @ts-ignore
-      (entry) => {
-        zip.deleteFile(entry.entryName);
-      },
+    const entrys = zipEntries.filter((entry) =>
+      options.ignore(entry.entryName)
     );
+    entrys.forEach((entry) => deleteFile(entry.entryName));
   }
 
   return zip.extractAllTo(output, true);
@@ -97,5 +89,33 @@ export function unzip(
       } as UnzipOptions;
     }
     return nameEncodingOrOptions;
+  }
+
+  function formatEntryNames() {
+    for (let i = 0; i < zipEntries.length; i++) {
+      const entry = zipEntries[i];
+      if (options?.nameEncoding) {
+        entry.entryName = iconv.decode(
+          entry.rawEntryName,
+          options.nameEncoding,
+        );
+        continue;
+      }
+      const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
+      if (confidence > 0.9 && Buffer.isEncoding(encoding)) {
+        entry.entryName = entry.rawEntryName.toString(encoding);
+        continue;
+      }
+      entry.entryName = iconv.decode(entry.rawEntryName, "gbk");
+    }
+  }
+
+  function deleteFile(entryName: string) {
+    const index = zipEntries.findIndex((entry) =>
+      entry.entryName === entryName
+    );
+    if (index !== -1) {
+      zipEntries.splice(index, 1);
+    }
   }
 }
