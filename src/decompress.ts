@@ -9,7 +9,6 @@ import {
   join,
   jschardet,
   Untar,
-  withResolvers,
 } from "./deps.ts";
 
 interface UntarOptions {
@@ -26,7 +25,7 @@ export async function untar(
   const paths: string[] = [];
   for await (const entry of untar) {
     const { fileName, type } = entry;
-    if (options?.ignore && options.ignore(fileName)) {
+    if (options?.ignore && options?.ignore(fileName)) {
       continue;
     }
     const path = join(output, fileName);
@@ -72,29 +71,28 @@ export async function unzip(
   output: string,
   nameEncodingOrOptions?: string | UnzipOptions,
 ): Promise<string[]> {
+  const paths: string[] = [];
   const options = useOptions();
+  const dirs = new Set<string>();
   const zip = new AdmZip(file);
   const zipEntries: Entry[] = zip.getEntries();
 
-  formatEntryNames();
-  const dirs = new Set<string>();
-  const paths: string[] = [];
   const promises = zipEntries.map(async (entry) => {
-    if (options?.ignore(entry.entryName)) {
+    formatEntryName(entry);
+    const { entryName, isDirectory } = entry;
+    if (options?.ignore(entryName)) {
       return;
     }
-    const path = join(output, entry.entryName);
-    if (entry.isDirectory) {
-      paths.push(path);
+    const path = join(output, entryName);
+    if (isDirectory) {
       return;
     }
     const dir = dirname(path);
     if (!dirs.has(dir)) {
+      paths.push(dir);
       await ensureDir(dir);
     }
-    const { promise, resolve } = withResolvers<Buffer>();
-    entry.getDataAsync(resolve);
-    await Deno.writeFile(path, await promise);
+    await Deno.writeFile(path, entry.getData());
     paths.push(path);
   });
 
@@ -113,22 +111,19 @@ export async function unzip(
     return nameEncodingOrOptions;
   }
 
-  function formatEntryNames() {
-    for (let i = 0; i < zipEntries.length; i++) {
-      const entry = zipEntries[i];
-      if (options?.nameEncoding) {
-        entry.entryName = iconv.decode(
-          entry.rawEntryName,
-          options.nameEncoding,
-        );
-        continue;
-      }
-      const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
-      if (confidence > 0.9 && Buffer.isEncoding(encoding)) {
-        entry.entryName = entry.rawEntryName.toString(encoding);
-        continue;
-      }
-      entry.entryName = iconv.decode(entry.rawEntryName, "gbk");
+  function formatEntryName(entry: Entry) {
+    if (options?.nameEncoding) {
+      entry.entryName = iconv.decode(
+        entry.rawEntryName,
+        options.nameEncoding,
+      );
+      return;
     }
+    const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
+    if (confidence > 0.9 && Buffer.isEncoding(encoding)) {
+      entry.entryName = entry.rawEntryName.toString(encoding);
+      return;
+    }
+    entry.entryName = iconv.decode(entry.rawEntryName, "gbk");
   }
 }

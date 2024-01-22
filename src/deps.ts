@@ -23,7 +23,6 @@ export {
   Command,
   EnumType,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
-export { withResolvers } from "https://deno.land/x/easy_std@v0.7.0/src/promise.ts";
 
 export { default as AdmZip } from "npm:adm-zip@0.5.10";
 export { default as iconv } from "npm:iconv-lite@0.6.3";

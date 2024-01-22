@@ -774,6 +774,9 @@
     "https://deno.land/x/easy_std@v0.6.0/src/listener.ts": "a27c85c2bf85323a244e809cefcd4cfdc50ae2588ead5ab7cccbcd23a6b1da14",
     "https://deno.land/x/easy_std@v0.6.0/src/process.ts": "21b1a4a226b56a40262d1efb43c142acbaf937d71372a1df95d7b9f3127ffe99",
     "https://deno.land/x/easy_std@v0.6.0/src/type.ts": "15dd06df70bdf8841889bc388c7a6c65aa9d74ae12d4abdaad9024e27ef2a897",
+    "https://deno.land/x/easy_std@v0.7.0/src/fn.ts": "a991a81fd690260c2dada4fdb563a7a3a4cda2f6a31dd31d36ea6d64ab1e7cf5",
+    "https://deno.land/x/easy_std@v0.7.0/src/promise.ts": "453c6bb0b238276eef6958c07ab4316b73425761a854ae3fa9e052db4f387551",
+    "https://deno.land/x/easy_std@v0.7.0/src/type.ts": "15dd06df70bdf8841889bc388c7a6c65aa9d74ae12d4abdaad9024e27ef2a897",
     "https://deno.land/x/which@0.3.0/mod.ts": "3e10d07953c14e4ddc809742a3447cef14202cdfe9be6678a1dfc8769c4487e6"
   }
 }
