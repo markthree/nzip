@@ -1,6 +1,7 @@
 // export * from "./src/deps.ts";
 export * from "./src/compress.ts";
 export * from "./src/decompress.ts";
+export * from "./src/config.ts";
 import { tar, zip } from "./src/compress.ts";
 import {
   Command,
@@ -17,7 +18,8 @@ import {
 } from "./src/deps.ts";
 import { version } from "./src/version.ts";
 import { untar, unzip } from "./src/decompress.ts";
-type ExternalSkip = Array<string | RegExp>;
+import { defaultConfig } from "./src/config.ts";
+import type { Config } from "./src/config.ts";
 
 if (import.meta.main) {
   const types = new EnumType(["tar", "zip"]);
@@ -110,16 +112,11 @@ export async function mayBeExists(output: string) {
 
 export async function walkFiles(
   dir: string,
-  externalskip: ExternalSkip = [],
+  externalskip = defaultConfig.skip,
 ) {
   const files: string[] = [];
-  const skip = [
-    /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|nitro|output))(?=[\\\/])/,
-  ];
 
-  externalskip?.forEach((s) => {
-    skip.push(typeof s === "string" ? new RegExp(s) : s);
-  });
+  const skip = externalskip?.map((s) => typeof s === "string" ? new RegExp(s) : s)
 
   for await (
     const entry of walk(dir, {
@@ -137,9 +134,7 @@ export async function walkFiles(
 
 export async function loadConfig() {
   const { loadConfig: _loadConfig } = await import("npm:c12@1.5.1");
-  const { config } = await _loadConfig<
-    { skip?: ExternalSkip; name?: string }
-  >({
+  const { config } = await _loadConfig<Config>({
     name: "nzip",
     packageJson: true,
   });
@@ -156,7 +151,7 @@ export async function loadOptions(options: Options) {
 
   if (options.withConfig) {
     const config = await loadConfig();
-    const name = config?.name ?? "default";
+    const name = config?.name ?? defaultConfig.name
     const output = `${name}.${options.type}`;
     const externalSkip = config?.skip ?? [];
     return {
