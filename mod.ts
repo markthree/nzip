@@ -1,4 +1,3 @@
-// export * from "./src/deps.ts";
 export * from "./src/compress.ts";
 export * from "./src/decompress.ts";
 export * from "./src/config.ts";
@@ -116,7 +115,9 @@ export async function walkFiles(
 ) {
   const files: string[] = [];
 
-  const skip = externalskip?.map((s) => typeof s === "string" ? new RegExp(s) : s)
+  const skip = externalskip?.map((s) =>
+    typeof s === "string" ? new RegExp(s) : s
+  );
 
   for await (
     const entry of walk(dir, {
@@ -151,7 +152,7 @@ export async function loadOptions(options: Options) {
 
   if (options.withConfig) {
     const config = await loadConfig();
-    const name = config?.name ?? defaultConfig.name
+    const name = config?.name ?? defaultConfig.name;
     const output = `${name}.${options.type}`;
     const externalSkip = config?.skip ?? [];
     return {

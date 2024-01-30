@@ -1,13 +1,4 @@
-import {
-  copy,
-  createReadStream,
-  createWriteStream,
-  fflate,
-  noop,
-  pipeline,
-  Readable,
-  Tar,
-} from "./deps.ts";
+import { AdmZip, Buffer, copy, Tar } from "./deps.ts";
 
 export async function tar(files: string[], output: string) {
   const tar = new Tar();
@@ -23,54 +14,15 @@ export async function tar(files: string[], output: string) {
   writer.close();
 }
 
-export function zip(files: string[], output: string) {
-  const outStream = createWriteStream(output);
-  const zipStream = createZipReadStream(files);
-  return new Promise((resolve, reject) => {
-    pipeline(zipStream, outStream, (err) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(null);
-      }
-    });
-  });
-}
+export async function zip(files: string[], output: string) {
+  const zip = new AdmZip();
 
-export function createZipDeflate(path: string) {
-  const srcStream = createReadStream(path);
-  const zipDeflate = new fflate.ZipDeflate(path);
-
-  srcStream.on("data", (chunk: Uint8Array) => {
-    zipDeflate.push(chunk);
+  const promises = files.map(async (file) => {
+    const content = await Deno.readFile(file);
+    zip.addFile(file, Buffer.from(content));
   });
 
-  srcStream.on("end", () => {
-    zipDeflate.push(new Uint8Array(0), true);
-  });
+  await Promise.all(promises);
 
-  return zipDeflate;
-}
-
-export function createZipReadStream(files: string[]) {
-  let push: (dat: Uint8Array | null) => void = noop;
-  const stream = new Readable({
-    read() {
-      push = this.push.bind(this);
-    },
-  });
-  const _zip = new fflate.Zip((err, dat, final) => {
-    if (err) {
-      throw err;
-    }
-    if (dat.length) {
-      push(dat);
-    }
-    if (final) {
-      push(null);
-    }
-  });
-  files.forEach((file) => _zip.add(createZipDeflate(file)));
-  _zip.end();
-  return stream;
+  await zip.writeZipPromise(output);
 }
