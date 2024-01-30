@@ -21,8 +21,18 @@ export {
   EnumType,
 } from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
 
-// @deno-types="https://esm.sh/v135/@types/adm-zip@0.5.5/index.d.ts"
 export { default as AdmZip } from "npm:adm-zip@0.5.10";
 export { default as iconv } from "npm:iconv-lite@0.6.3";
 export { default as jschardet } from "npm:jschardet@3.0.0";
 export { Buffer } from "node:buffer";
+
+export {
+  BlobReader,
+  BlobWriter,
+  TextReader,
+  TextWriter,
+  ZipReader,
+  ZipWriter,
+} from "https://deno.land/x/zipjs@v2.7.34/index.js";
+export type { Entry } from "https://deno.land/x/zipjs@v2.7.34/index.d.ts";
+export { noop } from "https://deno.land/x/easy_std@v0.8.0/src/fn.ts";

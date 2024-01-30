@@ -1,15 +1,6 @@
-import {
-  AdmZip,
-  Buffer,
-  copy,
-  dirname,
-  ensureDir,
-  ensureFile,
-  iconv,
-  join,
-  jschardet,
-  Untar,
-} from "./deps.ts";
+import { ensureFile } from "./deps.ts";
+import { copy, ensureDir, join, noop, Untar, ZipReader } from "./deps.ts";
+import { formatUnzipEntryFileName } from "./format.ts";
 
 interface UntarOptions {
   ignore?: (entryName: string) => boolean;
@@ -34,8 +25,8 @@ export async function untar(
       paths.push(path);
       continue;
     }
-    await ensureFile(path);
     paths.push(path);
+    await ensureFile(path);
     const file = await Deno.open(path, { write: true });
     await copy(entry, file);
   }
@@ -44,86 +35,45 @@ export async function untar(
 }
 
 interface UnzipOptions {
+  ignore?: (entryName: string) => boolean;
+  /**
+   * @default false
+   */
+  useWebWorkers?: boolean;
   nameEncoding?: string;
-  ignore: (entryName: string) => boolean;
 }
 
-interface Entry {
-  entryName: string;
-  rawEntryName: Buffer;
-  isDirectory: boolean;
-  getData(): Buffer;
-  getDataAsync(resolve: (data: Buffer) => void): void;
-}
-
-export function unzip(
-  file: string,
-  output: string,
-  nameEncoding?: string,
-): Promise<string[]>;
-export function unzip(
-  file: string,
-  output: string,
-  options?: UnzipOptions,
-): Promise<string[]>;
 export async function unzip(
   file: string,
   output: string,
-  nameEncodingOrOptions?: string | UnzipOptions,
-): Promise<string[]> {
+  options?: UnzipOptions,
+) {
+  using fd = await Deno.open(file);
+  const zipReader = new ZipReader(fd);
+  const entrys = await zipReader.getEntries();
   const paths: string[] = [];
-  const options = useOptions();
-  const dirs = new Set<string>();
-  const zip = new AdmZip(file);
-  const zipEntries: Entry[] = zip.getEntries();
-
-  const promises = zipEntries.map(async (entry) => {
-    formatEntryName(entry);
-    const { entryName, isDirectory } = entry;
-    if (options?.ignore(entryName)) {
+  const { ignore = noop, useWebWorkers = false, nameEncoding } = options || {};
+  const promises = entrys.map(async (entry) => {
+    formatUnzipEntryFileName(entry, nameEncoding);
+    if (ignore(entry.filename)) {
       return;
     }
-    const path = join(output, entryName);
-    if (isDirectory) {
-      return;
-    }
-    const dir = dirname(path);
-    if (!dirs.has(dir)) {
-      paths.push(dir);
-      await ensureDir(dir);
-    }
-    await Deno.writeFile(path, entry.getData());
+    const path = join(output, entry.filename);
     paths.push(path);
+    if (entry.directory) {
+      await ensureDir(path);
+      return;
+    }
+    if (!entry.getData) {
+      return;
+    }
+    await ensureFile(path);
+    using fd = await Deno.open(path, { write: true });
+    await entry?.getData(fd, {
+      useWebWorkers,
+    });
   });
-
   await Promise.all(promises);
-
+  await zipReader.close();
   return paths;
-
-  function useOptions() {
-    let nameEncoding: string | undefined;
-    if (typeof nameEncodingOrOptions === "string") {
-      nameEncoding = nameEncodingOrOptions;
-      return {
-        nameEncoding,
-      } as UnzipOptions;
-    }
-    return nameEncodingOrOptions;
-  }
-
-  function formatEntryName(entry: Entry) {
-    if (options?.nameEncoding) {
-      entry.entryName = iconv.decode(
-        entry.rawEntryName,
-        options.nameEncoding,
-      );
-      return;
-    }
-    const { encoding, confidence } = jschardet.detect(entry.rawEntryName);
-    if (confidence > 0.9 && Buffer.isEncoding(encoding)) {
-      entry.entryName = entry.rawEntryName.toString(encoding);
-      return;
-    }
-    entry.entryName = iconv.decode(entry.rawEntryName, "gbk");
-  }
 }
