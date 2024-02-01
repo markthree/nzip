@@ -18,7 +18,7 @@ import {
 import { version } from "./src/version.ts";
 import { untar, unzip } from "./src/decompress.ts";
 import { defaultConfig } from "./src/config.ts";
-import type { Config } from "./src/config.ts";
+import type { Config, ExternalSkip } from "./src/config.ts";
 
 if (import.meta.main) {
   const types = new EnumType(["tar", "zip"]);
@@ -111,7 +111,7 @@ export async function mayBeExists(output: string) {
 
 export async function walkFiles(
   dir: string,
-  externalskip = defaultConfig.skip,
+  externalskip?: ExternalSkip,
 ) {
   const files: string[] = [];
 
@@ -154,7 +154,7 @@ export async function loadOptions(options: Options) {
     const config = await loadConfig();
     const name = config?.name ?? defaultConfig.name;
     const output = `${name}.${options.type}`;
-    const externalSkip = config?.skip ?? [];
+    const externalSkip = config?.skip ?? defaultConfig.skip;
     return {
       cwd,
       output,
