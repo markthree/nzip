@@ -154,7 +154,10 @@ export async function loadOptions(options: Options) {
     const config = await loadConfig();
     const name = config?.name ?? defaultConfig.name;
     const output = `${name}.${options.type}`;
-    const externalSkip = config?.skip ?? defaultConfig.skip;
+    const externalSkip = config?.skip ?? [];
+    if (config?.withDefaltSkip) {
+      externalSkip.push(...defaultConfig.skip);
+    }
     return {
       cwd,
       output,
@@ -165,6 +168,6 @@ export async function loadOptions(options: Options) {
   return {
     cwd,
     type: options.type,
-    output: `default.${options.type}`,
+    output: `${defaultConfig.name}.${options.type}`,
   };
 }
