@@ -138,7 +138,14 @@ export async function loadConfig() {
   const { config } = await _loadConfig<Config>({
     name: "nzip",
     packageJson: true,
+    defaultConfig,
   });
+
+  if (config?.withDefaultSkip === false) {
+    defaultConfig.skip.forEach((s) => {
+      config.skip = config.skip?.filter((cs) => cs !== s);
+    });
+  }
   return config;
 }
 
@@ -152,12 +159,9 @@ export async function loadOptions(options: Options) {
 
   if (options.withConfig) {
     const config = await loadConfig();
-    const name = config?.name ?? defaultConfig.name;
+    const name = config?.name;
     const output = `${name}.${options.type}`;
     const externalSkip = config?.skip ?? [];
-    if (config?.withDefaltSkip) {
-      externalSkip.push(...defaultConfig.skip);
-    }
     return {
       cwd,
       output,

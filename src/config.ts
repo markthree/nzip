@@ -12,7 +12,7 @@ export interface Config {
   /**
    * @default true
    */
-  withDefaltSkip?: boolean;
+  withDefaultSkip?: boolean;
 }
 
 export const defaultConfig: Required<Config> = {
@@ -20,5 +20,5 @@ export const defaultConfig: Required<Config> = {
   skip: [
     /(?<=[\\\/])(node_modules|temp|cache|dist|\.(nuxt|nitro|output))(?=[\\\/])/,
   ],
-  withDefaltSkip: true,
+  withDefaultSkip: true,
 };
