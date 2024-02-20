@@ -31,3 +31,4 @@ export {
 } from "https://deno.land/x/zipjs@v2.7.34/index.js";
 export type { Entry } from "https://deno.land/x/zipjs@v2.7.34/index.d.ts";
 export { noop } from "https://deno.land/x/easy_std@v0.8.0/src/fn.ts";
+export { slash } from "https://deno.land/x/easy_std@v0.8.0/src/path.ts";

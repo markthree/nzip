@@ -1,4 +1,4 @@
-import { copy, ensureFile, Tar, ZipWriter } from "./deps.ts";
+import { copy, ensureFile, slash, Tar, ZipWriter } from "./deps.ts";
 
 export async function tar(files: string[], output: string) {
   const tar = new Tar();
@@ -6,7 +6,7 @@ export async function tar(files: string[], output: string) {
     const file of files
   ) {
     await tar.append(file, {
-      filePath: file,
+      filePath: slash(file),
     });
   }
   await ensureFile(output);
@@ -33,7 +33,7 @@ export async function zip(
   const { useWebWorkers = false } = options || {};
   const promises = files.map(async (file) => {
     using fd = await Deno.open(file, { read: true });
-    await zipWriter.add(file, fd, {
+    await zipWriter.add(slash(file), fd, {
       useWebWorkers,
     });
   });
