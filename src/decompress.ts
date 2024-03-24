@@ -1,9 +1,20 @@
-import { ensureFile } from "./deps.ts";
-import { copy, ensureDir, join, noop, Untar, ZipReader } from "./deps.ts";
 import { formatUnzipEntryFileName } from "./format.ts";
+import {
+  copy,
+  ensureDir,
+  ensureFile,
+  type Entry,
+  join,
+  noop,
+  pass,
+  TarEntry,
+  Untar,
+  ZipReader,
+} from "./deps.ts";
 
 interface UntarOptions {
   ignore?: (entryName: string) => boolean;
+  normalize?(entry: TarEntry[]): TarEntry[];
 }
 
 export async function untar(
@@ -14,7 +25,11 @@ export async function untar(
   const reader = await Deno.open(file, { read: true });
   const untar = new Untar(reader);
   const paths: string[] = [];
-  for await (const entry of untar) {
+  let entrys = await Array.fromAsync(untar);
+  if (options?.normalize) {
+    entrys = options.normalize(entrys);
+  }
+  for (const entry of entrys) {
     const { fileName, type } = entry;
     if (options?.ignore && options?.ignore(fileName)) {
       continue;
@@ -41,6 +56,8 @@ interface UnzipOptions {
    */
   useWebWorkers?: boolean;
   nameEncoding?: string;
+
+  normalize?(entry: Entry[]): Entry[];
 }
 
 export async function unzip(
@@ -52,9 +69,21 @@ export async function unzip(
   const zipReader = new ZipReader(fd);
   const entrys = await zipReader.getEntries();
   const paths: string[] = [];
-  const { ignore = noop, useWebWorkers = false, nameEncoding } = options || {};
-  const promises = entrys.map(async (entry) => {
-    formatUnzipEntryFileName(entry, nameEncoding);
+  const {
+    ignore = noop,
+    useWebWorkers = false,
+    nameEncoding,
+    normalize = pass,
+  } = options || {};
+
+  const newEntrys = normalize(
+    entrys.map((entry) => {
+      formatUnzipEntryFileName(entry, nameEncoding);
+      return entry;
+    }),
+  );
+
+  const promises = newEntrys.map(async (entry) => {
     if (ignore(entry.filename)) {
       return;
     }
