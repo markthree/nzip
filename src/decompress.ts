@@ -13,7 +13,7 @@ import {
 } from "./deps.ts";
 
 interface UntarOptions {
-  ignore?: (entryName: string) => boolean;
+  ignore?: (path: string) => boolean;
   normalize?(entry: TarEntry[]): TarEntry[];
 }
 
@@ -31,10 +31,10 @@ export async function untar(
   }
   for (const entry of entrys) {
     const { fileName, type } = entry;
-    if (options?.ignore && options?.ignore(fileName)) {
+    const path = join(output, fileName);
+    if (options?.ignore && options?.ignore(path)) {
       continue;
     }
-    const path = join(output, fileName);
     if (type === "directory") {
       await ensureDir(path);
       paths.push(path);
@@ -50,7 +50,7 @@ export async function untar(
 }
 
 interface UnzipOptions {
-  ignore?: (entryName: string) => boolean;
+  ignore?: (path: string) => boolean;
   /**
    * @default false
    */
@@ -84,10 +84,10 @@ export async function unzip(
   );
 
   const promises = newEntrys.map(async (entry) => {
-    if (ignore(entry.filename)) {
+    const path = join(output, entry.filename);
+    if (ignore(path)) {
       return;
     }
-    const path = join(output, entry.filename);
     paths.push(path);
     if (entry.directory) {
       await ensureDir(path);
