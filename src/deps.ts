@@ -23,7 +23,7 @@ export {
 export {
   Command,
   EnumType,
-} from "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts";
+} from "https://deno.land/x/cliffy@v1.0.0-rc.4/command/mod.ts";
 
 export { default as iconv } from "npm:iconv-lite@0.6.3";
 export { default as jschardet } from "npm:jschardet@3.0.0";
